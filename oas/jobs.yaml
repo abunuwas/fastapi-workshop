@@ -1,0 +1,347 @@
+openapi: 3.0.3
+
+info:
+  title: PyJobs API
+  description: API for listing and applying for Python jobs
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000
+    description: local development server
+  - url: https://pyjobs.works
+    description: production server
+
+paths:
+
+  /jobs:
+    get:
+      description: Returns a list of job postings
+      operationId: getJobs
+      parameters:
+        - name: perPage
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: page
+          in: query
+          description: Page to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: sortBy
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: string
+            enum:
+              - datePosted
+              - rate
+            default: datePosted
+        - name: contractType
+          in: query
+          description: Type of contract
+          required: false
+          schema:
+            type: string
+            enum:
+              - contract
+              - permanent
+        - name: dateSincePosted
+          in: query
+          description: Return jobs posted on and after selected date
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: A JSON array of jobs
+          content:
+            application/json:
+              schema:
+                required:
+                  - jobs
+                  - pages
+                properties:
+                  jobs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GetJob"
+                  pages:
+                    type: integer
+                    minimum: 1
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+    post:
+      description: Create a new job listing
+      operationId: listJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateJob"
+      responses:
+        '201':
+          description: A JSON representation of a job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetJob"
+
+  /jobs/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The job ID
+        schema:
+          type: string
+          format: uuid
+    get:
+      description: Get details of a job listing
+      operationId: getJob
+      responses:
+        '200':
+          description: A JSON representation of a job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateJob"
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      description: Update a job listing
+      operationId: updateJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateJob"
+      responses:
+        '200':
+          description: Job successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateJob"
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      description: Delete job listing
+      operationId: deleteJob
+      responses:
+        '204':
+          description: Job listing successfully deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /jobs/{id}/cancel:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The job ID
+        schema:
+          type: string
+          format: uuid
+    post:
+      description: Cancels a job listing
+      operationId: cancelJob
+      responses:
+        '201':
+          description: Job listing successfully cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetJob"
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /jobs/{id}/reactivate:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The job ID
+        schema:
+          type: string
+          format: uuid
+    post:
+      description: Reactivates a cancelled job listing
+      operationId: reactivateJob
+      responses:
+        '201':
+          description: Job listing successfully reactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetJob"
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  responses:
+    NotFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnprocessableEntity:
+      description: The payload contains invalid values.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: array
+      required:
+        - detail
+      additionalProperties: false
+    CreateJob:
+      additionalProperties: false
+      required:
+        - title
+        - rate
+        - benefits
+        - location
+        - hirer
+        - contractType
+        - description
+        - skills
+        - applicationDeadline
+        - liveUntil
+      properties:
+        title:
+          type: string
+        rate:
+          type: object
+          required:
+            - amount
+            - amountPerTime
+            - currency
+          properties:
+            amount:
+              type: number
+              minimum: 1
+            amountPerTime:
+              type: string
+              enum:
+                - hour
+                - day
+                - month
+                - year
+            currency:
+              type: string
+        benefits:
+          type: string
+        location:
+          type: string
+          format: uuid
+        hirer:
+          type: string
+          format: uuid
+        contractType:
+          type: string
+          enum:
+            - contract
+            - permanent
+        description:
+          type: string
+        skills:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        liveUntil:
+          type: string
+          format: date-time
+    GetJob:
+      required:
+        - id
+        - dateListed
+        - title
+        - rate
+        - benefits
+        - location
+        - hirer
+        - contractType
+        - description
+        - skills
+        - applicationDeadline
+        - liveUntil
+      properties:
+        title:
+          type: string
+        rate:
+          type: object
+          required:
+            - amount
+            - amountPerTime
+            - currency
+          properties:
+            amount:
+              type: number
+              minimum: 1
+            amountPerTime:
+              type: string
+              enum:
+                - hour
+                - day
+                - month
+                - year
+            currency:
+              type: string
+        benefits:
+          type: string
+        location:
+          type: object
+          required:
+            - city
+            - country
+          properties:
+            city:
+              type: string
+            state:
+              type: string
+            country:
+              type: string
+        hirer:
+          type: string
+        contractType:
+          type: string
+          enum:
+            - contract
+            - permanent
+        description:
+          type: string
+        skills:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        liveUntil:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uuid
+        dateListed:
+          type: string
+          format: date-time

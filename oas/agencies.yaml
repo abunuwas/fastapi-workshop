@@ -1,0 +1,94 @@
+openapi: 3.1.0
+
+info:
+  title: PyJobs API
+  description: API for listing and applying for Python jobs
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000
+    description: local development server
+  - url: https://pyjobs.works
+    description: production server
+
+paths:
+  /agencies:
+    get:
+      summary: Returns a list of agencies
+      operationId: getAgencies
+      tags:
+        - agencies
+      parameters:
+        - name: perPage
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: number
+        - name: page
+          in: query
+          description: Page to return
+          required: false
+          schema:
+            type: number
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+    post:
+      summary:
+      operationId:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+      responses:
+        201:
+          description:
+          content:
+            application/json:
+              schema:
+  /agencies/{id}:
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary:
+      operationId:
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+        404:
+    put:
+      summary:
+      operationId:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+        404:
+    delete:
+      summary:
+      operationId:
+      responses:
+        200:
+        404:
+components:
+  schemas:
+    Agency:
