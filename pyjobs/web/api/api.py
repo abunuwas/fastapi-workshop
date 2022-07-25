@@ -39,7 +39,7 @@ async def get_jobs(
     stop = start + perPage
     return {
         "jobs": list(islice(jobs_list, start, stop)),
-        "pages": len(jobs_list) / perPage,
+        "pages": (len(jobs_list) / perPage) if len(jobs_list) > perPage else 1,
     }
 
 
