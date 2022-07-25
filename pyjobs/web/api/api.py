@@ -111,7 +111,7 @@ async def cancel_job(job_id: uuid.UUID):
     )
 
 
-@router.post("jobs/{job_id}/reactivate", response_model=GetJobSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/jobs/{job_id}/reactivate", response_model=GetJobSchema, status_code=status.HTTP_201_CREATED)
 async def reactivate_job(job_id: uuid.UUID):
     for job in jobs:
         if job["id"] == job_id:
