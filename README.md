@@ -37,11 +37,3 @@ online.
 7. Add URL query parameters.
 8. Test with Swagger UI.
 9. Deploy to Heroku.
-
-## Free ebook copy of Microservice APIs raffle
-
-At the end of the workshop, I'll raffle a free ebook copy of my book 
-Microservice APIs.
-
-Enter your details [here](https://woorise.com/miocroapis/microservice-apis-ebook)
-to participate in the raffle.
