@@ -29,7 +29,7 @@ async def get_jobs(
     if dateSincePosted:
         jobs_list = [job for job in jobs if job["dateSincePosted"] >= dateSincePosted]
     if contractType:
-        jobs_list = [job for job in jobs if job["contractType"] >= contractType]
+        jobs_list = [job for job in jobs if job["contractType"] == contractType]
     jobs_list = sorted(
         jobs_list,
         key=lambda job: job["dateListed"] if sortBy == SortByEnum.datePosted else job["rate"]["amount"]
